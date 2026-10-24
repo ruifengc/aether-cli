@@ -26,7 +26,7 @@ async with Agent(my_model, tools=my_tools) as agent:
 
 ## 模型配置与应用默认值
 
-本机配置发现由 aether_cli.settings.load_settings 提供；只在调用时读取允许的环境变量或 ~/.hermes/.env，保留当前 CLI 的兼容行为，不属于 kernel。文件作为数据解析，不执行 shell，也不把读取的密钥写回环境变量。显式参数优先于配置，进程环境优先于文件。支持 tencent / deepseek 路由；默认使用 TokenHub Flash，CLI 的默认回答风格为 Answer concisely.。
+配置由 aether_cli.settings.load_settings 从显式选项和当前进程允许的环境变量中读取，不查找或读取任何配置文件，也不写回环境变量。缺少所选供应商凭据时明确报错；环境由宿主 shell 或启动器提供。支持 tencent / deepseek 路由；默认使用 TokenHub Flash，CLI 的默认回答风格为 Answer concisely.。
 
 --context-bytes 覆盖输入字节预算。CLI 对已确认的 Flash 1M 路由默认使用 input_bytes=800000，为输出与包装留余量；未知路由采用库的通用默认。模型窗口和字节预算是两个量，不宣称该预算利用满 1M tokens。
 
