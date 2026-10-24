@@ -22,7 +22,7 @@ aether --live --provider tencent --cwd .
 
 This makes real model requests. TokenHub defaults to `deepseek/deepseek-flash`; `--model` and `--reasoning` override model settings. Direct DeepSeek access uses `--provider deepseek` and `DEEPSEEK_API_KEY`. `--cwd` requires a directory argument; `.` means the current directory.
 
-Configuration is loaded by `aether_cli.settings.load_settings`. Process environment values take precedence over the compatible `~/.hermes/.env` file; the file is parsed as data rather than executed. This configuration discovery belongs to the application. The Aether library receives explicit settings.
+Configuration is loaded by `aether_cli.settings.load_settings` from explicit command-line options and the process environment only. The CLI does not discover or read configuration files. Missing credentials produce an error; your shell or launcher supplies them. The Aether library receives explicit settings.
 
 The Aether dependency is pinned to a public GitHub commit in the package metadata and lockfile. Installation needs GitHub and package-index access, with no private Gitea server, sibling source directory or PyPI package named `aether` required. These projects are not yet published to PyPI.
 
@@ -72,6 +72,6 @@ uv build
 
 `uv run aether --live --provider tencent --cwd .` starts real interaction from the checkout. `python -m aether_cli` is equivalent to the installed `aether` command. Importable application code lives in `src/aether_cli`; runtime code stays in the independent Aether library.
 
-Checks cover worktree and index credential scans, Ruff, 19 application/terminal tests and both scripted demos. Tests use controlled models and real pseudoterminals, with no live-model requests. Source distributions include both READMEs, usage documentation, examples, tests and check scripts.
+Checks cover worktree and index credential scans, Ruff, 21 application/terminal tests and both scripted demos. Tests use controlled models and real pseudoterminals, with no live-model requests. Source distributions include both READMEs, usage documentation, examples, tests and check scripts.
 
 For joint local development, `uv add --editable ../aether` temporarily replaces the pinned dependency; restore the committed dependency and lockfile before submitting changes.
