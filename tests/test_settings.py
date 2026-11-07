@@ -54,3 +54,12 @@ class SettingsTests(unittest.TestCase):
         self.assertEqual(settings.provider, "tencent")
         self.assertEqual(settings.model, "explicit-model")
         self.assertEqual(settings.reasoning, "high")
+
+    def test_thinking_setting_has_explicit_auto_and_disable_semantics(self):
+        environment = {"TOKENHUB_API_KEY": "test-credential", "LLM_THINKING": "disabled"}
+        with patch.dict(os.environ, environment, clear=True):
+            self.assertFalse(load_settings().thinking)
+            self.assertIsNone(load_settings(thinking="auto").thinking)
+            self.assertTrue(load_settings(thinking="enabled").thinking)
+            with self.assertRaisesRegex(ValueError, "thinking"):
+                load_settings(thinking="false")

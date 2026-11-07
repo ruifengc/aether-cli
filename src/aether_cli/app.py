@@ -6,6 +6,7 @@ import argparse
 import asyncio
 import importlib
 import inspect
+from contextlib import AsyncExitStack
 
 from aether import Agent, ContextPolicy, Limits, SubscriptionOverflow, Tool
 from aether.chat import ChatModel
@@ -108,7 +109,12 @@ async def run(agent: Agent, *, debug: bool = False):
 
 
 async def main(args, *, tools=()):
-    """Compose this CLI's model and tools through public library interfaces."""
+    """Compose host-owned HTTP connections and the runtime in shutdown order."""
+    async with AsyncExitStack() as stack:
+        await _main(args, tools, stack)
+
+
+async def _main(args, tools, stack):
     registered = [*tools, *load_tools(args.tools)]
     input_bytes = getattr(args, "context_bytes", None)
     if args.demo or not args.live:
@@ -118,7 +124,8 @@ async def main(args, *, tools=()):
     if args.live:
         if not args.no_builtin_tools:
             registered = [*local_tools(args.cwd), *registered]
-        settings = load_settings(provider=args.provider, model=args.model, reasoning=args.reasoning)
+        settings = load_settings(provider=args.provider, model=args.model, reasoning=args.reasoning,
+                                 thinking=getattr(args, "thinking", None))
         # These routes advertise 1M tokens; the application keeps a conservative byte cap.
         if input_bytes is None and (settings.provider, settings.model) in {
             ("tencent", "deepseek/deepseek-flash"),
@@ -127,8 +134,15 @@ async def main(args, *, tools=()):
             ("deepseek", "deepseek-flash"),
         }:
             input_bytes = 800000
-        model = ChatModel(settings)
-        print(f"模型：{settings.model} · {settings.reasoning or '默认档位'}", flush=True)
+        import httpx
+
+        client = await stack.enter_async_context(httpx.AsyncClient())
+        model = ChatModel(settings, client=client,
+                          max_tokens=getattr(args, "max_tokens", 1536),
+                          max_output_tokens=getattr(args, "max_output_tokens", 8192))
+        reasoning_label = ("思考关闭" if settings.thinking is False
+                           else settings.reasoning or "供应商默认档位")
+        print(f"模型：{settings.model} · {reasoning_label}", flush=True)
     else:
         model = DemoModel()
         print("离线演示：工具运行期间可补充150克重量条件。", flush=True)
@@ -148,7 +162,13 @@ def cli(argv=None):
     parser.add_argument("--debug", action="store_true", help="Print full events and query snapshots")
     parser.add_argument("--provider", choices=("tencent", "deepseek"))
     parser.add_argument("--model")
-    parser.add_argument("--reasoning", default="high")
+    parser.add_argument("--reasoning", help="Reasoning effort; defaults to environment or high")
+    parser.add_argument("--thinking", choices=("auto", "enabled", "disabled"),
+                        help="Explicit thinking mode; auto leaves the provider default")
+    parser.add_argument("--max-tokens", type=int, default=1536,
+                        help="Initial completion budget, including reasoning (default: 1536)")
+    parser.add_argument("--max-output-tokens", type=int, default=8192,
+                        help="Completion budget ceiling during length recovery (default: 8192)")
     parser.add_argument("--cwd", default=".", help="Base directory for built-in local tools")
     parser.add_argument("--context-bytes", type=int,
                         help="Conservative input byte budget; known DeepSeek Flash 1M routes use 800000")

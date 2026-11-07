@@ -140,5 +140,24 @@ def show_query(snapshot, *, debug=False):
           f"摘要 {snapshot['summary_calls']} 次 · 恢复 {snapshot['recoveries']} 次\n"
           f"输入 {usage['prompt_tokens']} / 输出 {usage['completion_tokens']} tokens"
           + ("（用量不完整）" if not usage["known"] else ""), flush=True)
+    reports = snapshot.get("usage_reports", {})
+    fields = reports.get("fields", {})
+    cached = usage.get("prompt_cache_hit_tokens")
+    cache_field = "prompt_cache_hit_tokens"
+    if cached is None:
+        cached = usage.get("prompt_tokens_details", {}).get("cached_tokens")
+        cache_field = "prompt_tokens_details.cached_tokens"
+    if cached is not None:
+        complete = (reports.get("calls", 0) > 0
+                    and fields.get(cache_field) == reports["calls"]
+                    and fields.get("prompt_tokens") == reports["calls"])
+        detail = (f"（{cached / usage['prompt_tokens']:.1%}）"
+                  if complete and usage["prompt_tokens"] > 0 else "（已报告部分）")
+        print(f"缓存命中 {cached} tokens{detail}", flush=True)
+    reasoning = usage.get("completion_tokens_details", {}).get("reasoning_tokens")
+    if reasoning is not None:
+        complete = (reports.get("calls", 0) > 0 and
+                    fields.get("completion_tokens_details.reasoning_tokens") == reports["calls"])
+        print(f"推理 {reasoning} tokens" + ("" if complete else "（已报告部分）"), flush=True)
     if snapshot["error"]:
         print(f"原因：{snapshot['error']}", flush=True)

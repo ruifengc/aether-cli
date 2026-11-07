@@ -4,7 +4,7 @@ version = "0.1.1"
 description = "Terminal application built on the Aether LLM runtime"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = ["aether[live] @ git+https://github.com/ruifengc/aether.git@3123b708f438dc52333bf52ef86e6b4948a3fd63", "prompt-toolkit>=3.0,<4"]
+dependencies = ["aether[live] @ git+https://github.com/ruifengc/aether.git@7141a3d9ca0139a1b60018b0c866f74a63000f9b", "prompt-toolkit>=3.0,<4"]
 
 [project.urls]
 Repository = "https://github.com/ruifengc/aether-cli"

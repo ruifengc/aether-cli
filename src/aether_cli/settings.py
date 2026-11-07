@@ -8,11 +8,12 @@ from aether.chat import Settings
 
 
 def load_settings(*, provider: str | None = None,
-                  model: str | None = None, reasoning: str | None = None) -> Settings:
+                  model: str | None = None, reasoning: str | None = None,
+                  thinking: str | None = None) -> Settings:
     """Read the host-provided environment; never discover or read configuration files."""
     allowed = {"TOKENHUB_API_KEY", "TENCENT_API_KEY", "TOKENHUB_BASE_URL", "DEEPSEEK_API_KEY",
                "DEEPSEEK_BASE_URL", "DEEPSEEK_MODEL", "LLM_PROVIDER", "LLM_PRO_MODEL",
-               "LLM_PRO_REASONING_EFFORT", "QUERY_AGENT_MODEL"}
+               "LLM_PRO_REASONING_EFFORT", "QUERY_AGENT_MODEL", "LLM_THINKING"}
     values = {key: value for key, value in os.environ.items() if key in allowed}
     provider = provider or values.get("LLM_PROVIDER", "tencent")
     if provider == "tencent":
@@ -28,6 +29,10 @@ def load_settings(*, provider: str | None = None,
         raise ValueError("supported providers: tencent, deepseek")
     if not key:
         raise ValueError(f"no credential configured for {provider}")
+    thinking = thinking if thinking is not None else values.get("LLM_THINKING", "auto")
+    if thinking not in {"auto", "enabled", "disabled"}:
+        raise ValueError("thinking must be auto, enabled or disabled")
     return Settings(key, url.rstrip("/"), selected, provider,
                     reasoning if reasoning is not None else
-                    (values.get("LLM_PRO_REASONING_EFFORT") or "high"))
+                    (values.get("LLM_PRO_REASONING_EFFORT") or "high"),
+                    {"auto": None, "enabled": True, "disabled": False}[thinking])

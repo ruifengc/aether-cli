@@ -75,3 +75,5 @@ uv build
 检查包含工作区和实际 index 的凭据扫描、Ruff、21 项应用与终端测试，以及两种固定脚本演示。测试使用受控模型与真实伪终端，不请求真实模型。源码发行包包含两份 README、使用文档、示例、测试与检查脚本。
 
 联合开发时，可以用 `uv add --editable ../aether` 临时覆盖固定依赖；提交前恢复已提交的依赖声明与锁文件。
+
+真实模式在整场会话中复用 HTTP 客户端，先关闭 Agent 再关闭连接池。`--thinking enabled|disabled|auto`（或 `LLM_THINKING`）控制供应商思考开关；`--reasoning` 默认读取 `LLM_PRO_REASONING_EFFORT`，再回落到 high。`--max-tokens`（1536）和 `--max-output-tokens`（8192）分别控制初始与恢复 completion 额度，包含推理 token。`/query` 展示已报告的缓存与推理总量；覆盖不全时明确标记，不展示误导性的命中率。

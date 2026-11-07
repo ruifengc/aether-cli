@@ -23,6 +23,27 @@ def event(kind, **data):
 
 
 class PresentationTests(unittest.TestCase):
+    def test_usage_details_show_partial_coverage_without_a_false_hit_rate(self):
+        snapshot = {"run_id": "abcdef", "state": "succeeded", "phase": None, "pending": [],
+                    "model_calls": 2, "tool_calls": 0, "summary_calls": 0, "recoveries": 1,
+                    "error": None, "usage": {"prompt_tokens": 250, "completion_tokens": 50,
+                        "known": True, "prompt_tokens_details": {"cached_tokens": 80},
+                        "completion_tokens_details": {"reasoning_tokens": 18}},
+                    "usage_reports": {"calls": 2, "fields": {"prompt_tokens": 2,
+                        "prompt_tokens_details.cached_tokens": 1,
+                        "completion_tokens_details.reasoning_tokens": 1}}}
+        output = io.StringIO()
+        with patch("sys.stdout", output):
+            console.show_query(snapshot)
+        self.assertIn("缓存命中 80 tokens（已报告部分）", output.getvalue())
+        self.assertIn("推理 18 tokens（已报告部分）", output.getvalue())
+        self.assertNotIn("%", output.getvalue())
+        snapshot["usage_reports"]["fields"]["prompt_tokens_details.cached_tokens"] = 2
+        output = io.StringIO()
+        with patch("sys.stdout", output):
+            console.show_query(snapshot)
+        self.assertIn("32.0%", output.getvalue())
+
     def test_answers_keep_newlines_and_tool_bodies_do_not_flood_normal_output(self):
         output = io.StringIO()
         with patch("sys.stdout", output):

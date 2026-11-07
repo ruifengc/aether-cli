@@ -72,6 +72,8 @@ uv build
 
 `uv run aether --live --provider tencent --cwd .` starts real interaction from the checkout. `python -m aether_cli` is equivalent to the installed `aether` command. Importable application code lives in `src/aether_cli`; runtime code stays in the independent Aether library.
 
-Checks cover worktree and index credential scans, Ruff, 21 application/terminal tests and both scripted demos. Tests use controlled models and real pseudoterminals, with no live-model requests. Source distributions include both READMEs, usage documentation, examples, tests and check scripts.
+Checks cover worktree and index credential scans, Ruff, application/terminal tests and both scripted demos. Tests use controlled models and real pseudoterminals, with no live-model requests. Source distributions include both READMEs, usage documentation, examples, tests and check scripts.
 
 For joint local development, `uv add --editable ../aether` temporarily replaces the pinned dependency; restore the committed dependency and lockfile before submitting changes.
+
+Live mode borrows a host-owned HTTP client across the session and closes it after the Agent. `--thinking enabled|disabled|auto` (or `LLM_THINKING`) selects the provider thinking switch. `--reasoning` defaults to `LLM_PRO_REASONING_EFFORT`, then `high`. `--max-tokens` (1536) and `--max-output-tokens` (8192) control the initial and recovery completion budgets, including reasoning. `/query` shows reported cache and reasoning totals; partial coverage is marked instead of presenting a misleading hit rate.

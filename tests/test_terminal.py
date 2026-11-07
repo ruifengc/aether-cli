@@ -18,6 +18,35 @@ from aether_cli import app as terminal
 
 
 class TerminalTests(unittest.IsolatedAsyncioTestCase):
+    async def test_cli_owns_client_and_passes_thinking_and_completion_limits(self):
+        model = ControlledModel()
+        args = SimpleNamespace(live=True, demo=False, provider="tencent", model="test",
+                               reasoning="low", thinking="disabled", max_tokens=4096,
+                               max_output_tokens=16384, no_builtin_tools=True, cwd=".",
+                               tools=[], debug=False)
+
+        async def view(agent, **kwargs):
+            self.assertFalse(construct.call_args.kwargs["client"].is_closed)
+
+        with (patch.object(terminal, "run", view), patch.object(terminal, "load_settings",
+                return_value=Settings("test", "https://model.invalid", "test", "tencent")) as load,
+              patch.object(terminal, "ChatModel", return_value=model) as construct,
+              patch("builtins.print")):
+            await terminal.main(args)
+        self.assertTrue(construct.call_args.kwargs["client"].is_closed)
+        self.assertEqual(construct.call_args.kwargs["max_tokens"], 4096)
+        self.assertEqual(construct.call_args.kwargs["max_output_tokens"], 16384)
+        self.assertEqual(load.call_args.kwargs["thinking"], "disabled")
+
+    def test_parser_preserves_environment_reasoning_default_and_output_controls(self):
+        with patch.object(terminal, "main") as main:
+            terminal.cli(["--thinking", "disabled", "--max-tokens", "4096",
+                          "--max-output-tokens", "16384"])
+        args = main.call_args.args[0]
+        self.assertIsNone(args.reasoning)
+        self.assertEqual(args.thinking, "disabled")
+        self.assertEqual((args.max_tokens, args.max_output_tokens), (4096, 16384))
+
     async def test_cli_can_disable_builtins_and_keeps_custom_tools(self):
         captured = []
         provider = types.ModuleType("test_selected_tools")
