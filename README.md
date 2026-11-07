@@ -6,7 +6,7 @@ A terminal application built on [Aether](https://github.com/ruifengc/aether), wi
 
 [Detailed usage (Chinese)](docs/usage.md) · [Custom tool example](examples/extra_tools.py)
 
-## Install and use a real LLM
+## Installation and usage
 
 Requires Python 3.11+, Git and uv. Install into an isolated tool environment:
 
@@ -24,7 +24,7 @@ This makes real model requests. TokenHub defaults to `deepseek/deepseek-flash`; 
 
 Configuration is loaded by `aether_cli.settings.load_settings` from explicit command-line options and the process environment only. The CLI does not discover or read configuration files. Missing credentials produce an error; your shell or launcher supplies them. The Aether library receives explicit settings.
 
-The Aether dependency is pinned to a public GitHub commit in the package metadata and lockfile. Installation needs GitHub and package-index access, with no private Gitea server, sibling source directory or PyPI package named `aether` required. These projects are not yet published to PyPI.
+The Aether dependency is pinned to a public GitHub commit in the package metadata and lockfile. Installation requires GitHub and package-index access. These projects are not yet published to PyPI.
 
 ## Scripted demo
 
@@ -72,6 +72,8 @@ uv build
 
 `uv run aether --live --provider tencent --cwd .` starts real interaction from the checkout. `python -m aether_cli` is equivalent to the installed `aether` command. Importable application code lives in `src/aether_cli`; runtime code stays in the independent Aether library.
 
-Checks cover worktree and index credential scans, Ruff, 21 application/terminal tests and both scripted demos. Tests use controlled models and real pseudoterminals, with no live-model requests. Source distributions include both READMEs, usage documentation, examples, tests and check scripts.
+Checks cover worktree and index credential scans, Ruff, application/terminal tests and both scripted demos. Tests use controlled models and real pseudoterminals, with no live-model requests. Source distributions include both READMEs, usage documentation, examples, tests and check scripts.
 
 For joint local development, `uv add --editable ../aether` temporarily replaces the pinned dependency; restore the committed dependency and lockfile before submitting changes.
+
+Aether manages model connections and releases them when the Agent closes. `--thinking enabled|disabled|auto` (or `LLM_THINKING`) selects the provider thinking switch. `--reasoning` defaults to `LLM_PRO_REASONING_EFFORT`, then `high`. `--max-tokens` (1536) and `--max-output-tokens` (8192) control the initial and recovery completion budgets, including reasoning. `/query` shows reported cache and reasoning totals; partial coverage is marked instead of presenting a misleading hit rate.

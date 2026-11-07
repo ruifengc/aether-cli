@@ -2,7 +2,7 @@
 
 ## CLI 应用与工具扩展
 
-入口由 aether-cli 提供：`uv run python -m aether_cli` 或 `uv run aether`。kernel 包没有 CLI 入口。`--live` 使用真实模型，默认 high；真实交互显式注册 Aether 提供的五种本地工具，--no-builtin-tools 关闭默认工具但仍加载用户追加工具，--cwd PATH 设置工具路径基准。省略 --live 使用固定脚本，--demo 运行一次有界演示；演示模型、资料和 catalog 工具仅在 CLI 包中。
+入口由 aether-cli 提供：`uv run python -m aether_cli` 或 `uv run aether`。kernel 包没有 CLI 入口。`--live` 使用真实模型，推理强度未显式指定时读取环境配置，再回落到 high；真实交互显式注册 Aether 提供的五种本地工具，--no-builtin-tools 关闭默认工具但仍加载用户追加工具，--cwd PATH 设置工具路径基准。省略 --live 使用固定脚本，--demo 运行一次有界演示；演示模型、资料和 catalog 工具仅在 CLI 包中。
 
 默认保留回答与提问的真实换行，只显示工具名称、目标和简短完成或错误状态，不展开工具正文。`--debug` 显示完整运行事件，并让 `/query` 输出原始 JSON 快照；普通 `/query` 只显示工作状态、操作次数与 token 用量。两种模式都只观察，不触发模型调用。持续展示统一使用订阅，溢出后按游标查询补齐。
 
@@ -39,3 +39,9 @@ Aether 依赖通过公开 GitHub 仓库的固定提交安装，pyproject.toml �
 `aether --demo` 使用 DemoModel 的固定 Python 规则与虚构设备资料，不执行 LLM 推理。它先提交资料查询，再在工具执行期间追加150克重量条件，最后输出 GAMMA；用于验证工具执行、途中补充、事件展示与结果回流。未指定 --live 的交互模式同样使用固定规则，不是通用自然语言助手。初次安装依赖需要网络；环境准备好后，演示本身不发起网络请求。
 
 使用真实模型须指定 --live，并配置所选供应商的凭据。演示、单元测试与伪终端测试不能替代真实模型效果验证。
+
+## 后端观察与输出额度
+
+Aether 管理并复用决策和摘要请求的连接，关闭 Agent 时释放连接。`--thinking enabled|disabled|auto` 对应明确启用、明确关闭、保留供应商默认值；未传时读取 LLM_THINKING。`--reasoning` 未传时读取 LLM_PRO_REASONING_EFFORT，再回落到 high；reasoning 省略不等于关闭思考。
+
+`--max-tokens 4096 --max-output-tokens 16384` 可以为推理与输出预留更多空间；两者仍受同一运行次数和恢复次数限制。默认值保持 1536/8192，未宣称对所有模型足够。`/query` 汇总缓存命中、推理 token；只有输入和缓存字段覆盖全部计量请求时才计算命中率。原始字段、结束原因和整次决定耗时可在 --debug 中查看；不是流式输出或 TTFT 测量。

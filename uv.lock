@@ -5,7 +5,7 @@ requires-python = ">=3.11"
 [[package]]
 name = "aether"
 version = "0.1.0"
-source = { git = "https://github.com/ruifengc/aether.git?rev=3123b708f438dc52333bf52ef86e6b4948a3fd63#3123b708f438dc52333bf52ef86e6b4948a3fd63" }
+source = { git = "https://github.com/ruifengc/aether.git?rev=2eb24dab49d53b2d1e76bbec4ef966e17dfb894f#2eb24dab49d53b2d1e76bbec4ef966e17dfb894f" }
 
 [package.optional-dependencies]
 live = [
@@ -28,7 +28,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "aether", extras = ["live"], git = "https://github.com/ruifengc/aether.git?rev=3123b708f438dc52333bf52ef86e6b4948a3fd63" },
+    { name = "aether", extras = ["live"], git = "https://github.com/ruifengc/aether.git?rev=2eb24dab49d53b2d1e76bbec4ef966e17dfb894f" },
     { name = "prompt-toolkit", specifier = ">=3.0,<4" },
 ]
 

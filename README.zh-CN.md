@@ -6,7 +6,7 @@
 
 [详细用法](docs/usage.md) · [自定义工具示例](examples/extra_tools.py)
 
-## 安装并使用真实 LLM
+## 安装与使用
 
 需要 Python 3.11+、Git 和 uv。安装到独立工具环境：
 
@@ -24,7 +24,7 @@ aether --live --provider tencent --cwd .
 
 `aether_cli.settings.load_settings` 只读取显式命令行选项和当前进程环境，不查找或读取任何配置文件。缺少凭据时明确报错，由宿主 shell 或启动器提供凭据；Aether 库仍只接收显式配置。
 
-安装包元数据和锁文件均固定依赖 Aether 公开 GitHub 仓库的一个提交。安装需要访问 GitHub 和包索引，不依赖内网 Gitea、本机兄弟源码目录或 PyPI 上的同名 `aether` 包。这两个项目目前尚未发布到 PyPI。
+Aether 依赖在包元数据与锁文件中固定到公开 GitHub 仓库的具体提交。安装需要访问 GitHub 和包索引。两个项目目前均未发布到 PyPI。
 
 ## 固定脚本演示
 
@@ -72,6 +72,8 @@ uv build
 
 在源码目录执行 `uv run aether --live --provider tencent --cwd .` 开始真实交互。`python -m aether_cli` 与安装后的 `aether` 命令等价。应用代码位于 `src/aether_cli`，运行机制保留在独立 Aether 库中。
 
-检查包含工作区和实际 index 的凭据扫描、Ruff、21 项应用与终端测试，以及两种固定脚本演示。测试使用受控模型与真实伪终端，不请求真实模型。源码发行包包含两份 README、使用文档、示例、测试与检查脚本。
+检查包含工作区和实际 index 的凭据扫描、Ruff、应用与终端测试，以及两种固定脚本演示。测试使用受控模型与真实伪终端，不请求真实模型。源码发行包包含两份 README、使用文档、示例、测试与检查脚本。
 
 联合开发时，可以用 `uv add --editable ../aether` 临时覆盖固定依赖；提交前恢复已提交的依赖声明与锁文件。
+
+Aether 在会话中管理模型连接，关闭 Agent 时释放连接池。`--thinking enabled|disabled|auto`（或 `LLM_THINKING`）控制供应商思考开关；`--reasoning` 默认读取 `LLM_PRO_REASONING_EFFORT`，再回落到 high。`--max-tokens`（1536）和 `--max-output-tokens`（8192）分别控制初始与恢复 completion 额度，包含推理 token。`/query` 展示已报告的缓存与推理总量；覆盖不全时明确标记，不展示误导性的命中率。
