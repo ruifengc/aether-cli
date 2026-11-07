@@ -72,7 +72,7 @@ uv build
 
 在源码目录执行 `uv run aether --live --provider tencent --cwd .` 开始真实交互。`python -m aether_cli` 与安装后的 `aether` 命令等价。应用代码位于 `src/aether_cli`，运行机制保留在独立 Aether 库中。
 
-检查包含工作区和实际 index 的凭据扫描、Ruff、21 项应用与终端测试，以及两种固定脚本演示。测试使用受控模型与真实伪终端，不请求真实模型。源码发行包包含两份 README、使用文档、示例、测试与检查脚本。
+检查包含工作区和实际 index 的凭据扫描、Ruff、应用与终端测试，以及两种固定脚本演示。测试使用受控模型与真实伪终端，不请求真实模型。源码发行包包含两份 README、使用文档、示例、测试与检查脚本。
 
 联合开发时，可以用 `uv add --editable ../aether` 临时覆盖固定依赖；提交前恢复已提交的依赖声明与锁文件。
 

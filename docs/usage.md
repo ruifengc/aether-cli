@@ -2,7 +2,7 @@
 
 ## CLI 应用与工具扩展
 
-入口由 aether-cli 提供：`uv run python -m aether_cli` 或 `uv run aether`。kernel 包没有 CLI 入口。`--live` 使用真实模型，默认 high；真实交互显式注册 Aether 提供的五种本地工具，--no-builtin-tools 关闭默认工具但仍加载用户追加工具，--cwd PATH 设置工具路径基准。省略 --live 使用固定脚本，--demo 运行一次有界演示；演示模型、资料和 catalog 工具仅在 CLI 包中。
+入口由 aether-cli 提供：`uv run python -m aether_cli` 或 `uv run aether`。kernel 包没有 CLI 入口。`--live` 使用真实模型，推理强度未显式指定时读取环境配置，再回落到 high；真实交互显式注册 Aether 提供的五种本地工具，--no-builtin-tools 关闭默认工具但仍加载用户追加工具，--cwd PATH 设置工具路径基准。省略 --live 使用固定脚本，--demo 运行一次有界演示；演示模型、资料和 catalog 工具仅在 CLI 包中。
 
 默认保留回答与提问的真实换行，只显示工具名称、目标和简短完成或错误状态，不展开工具正文。`--debug` 显示完整运行事件，并让 `/query` 输出原始 JSON 快照；普通 `/query` 只显示工作状态、操作次数与 token 用量。两种模式都只观察，不触发模型调用。持续展示统一使用订阅，溢出后按游标查询补齐。
 
